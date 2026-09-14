@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal - Picnic Party Math Analytics</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'cursive', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        picnicRed: '#FF6B6B',
+                        picnicYellow: '#FFD166',
+                        picnicGreen: '#06D6A0',
+                        picnicBlue: '#118AB2',
+                        picnicDark: '#073B4C',
+                        picnicCream: '#FFFDF5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFDF5;
+            background-image: radial-gradient(#FFD166 15%, transparent 16%), radial-gradient(#FF6B6B 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+        }
+        h1, h2, h3, h4, .font-fun {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .bubbly-card {
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(7, 59, 76, 0.1), 0 8px 10px -6px rgba(7, 59, 76, 0.1);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-picnicDark min-h-screen flex flex-col justify-between">
+
+    <script>
+        // Optional Google Apps Script Web App URL for fetching from Google Sheets
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMdDU1jKHuIKG35V0aKxs5IsSXn94COoN_NDtMqiVl8m7vvGiKFXW870lpYW9npmsv/exec";
+    </script>
+
+    <!-- HEADER -->
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b-4 border-picnicDark">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-picnicDark flex items-center justify-center text-white text-xl shadow-md">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-picnicDark tracking-wide">Teacher Portal <span class="text-xs bg-picnicYellow px-2 py-0.5 rounded-full text-picnicDark font-inter uppercase">Analytics</span></h1>
+                    <p class="text-xs text-gray-500">Picnic Party Math • Primary 1 MOE Curriculum</p>
+                </div>
+            </div>
+
+            <a href="index.html" class="flex items-center space-x-2 bg-picnicBlue text-white px-4 py-2 rounded-full font-fredoka text-sm shadow-sm hover:bg-sky-600 transition">
+                <i class="fa-solid fa-house"></i>
+                <span>Back to Student Hub</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full space-y-6">
+
+        <!-- DASHBOARD SUMMARY CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bubbly-card bg-white p-5 border-4 border-picnicYellow">
+                <span class="text-xs font-bold text-gray-500 uppercase">Total Submissions</span>
+                <p id="teacherTotalSubs" class="text-3xl font-bold font-fun text-picnicDark mt-1">0</p>
+            </div>
+            <div class="bubbly-card bg-white p-5 border-4 border-picnicBlue/40">
+                <span class="text-xs font-bold text-gray-500 uppercase">Average Class Score</span>
+                <p id="teacherAvgScore" class="text-3xl font-bold font-fun text-picnicBlue mt-1">0 pts</p>
+            </div>
+            <div class="bubbly-card bg-white p-5 border-4 border-emerald-300">
+                <span class="text-xs font-bold text-gray-500 uppercase">Active Status</span>
+                <p class="text-xl font-bold font-fun text-emerald-700 mt-2">Active & Monitoring</p>
+            </div>
+        </div>
+
+        <div class="bubbly-card bg-white p-6 sm:p-8 border-4 border-picnicDark space-y-4">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+                <div>
+                    <h2 class="text-2xl font-bold font-fun text-picnicDark">Student Submissions Log</h2>
+                    <p class="text-xs text-gray-500">Monitor student mastery, correct scores, and common mathematical misconceptions.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="loadTeacherDashboardData()" class="bg-picnicBlue text-white text-xs font-fredoka px-3 py-2 rounded-xl shadow-sm hover:bg-sky-600 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate mr-1"></i> <span>Refresh Data</span>
+                    </button>
+                    <button onclick="exportCSVReport()" class="bg-picnicGreen text-white text-xs font-fredoka px-3 py-2 rounded-xl shadow-sm hover:bg-emerald-600 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-file-csv mr-1"></i> <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border-2 border-gray-100">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600 font-fredoka border-b">
+                            <th class="p-3">Timestamp</th>
+                            <th class="p-3">Student Name</th>
+                            <th class="p-3">Class</th>
+                            <th class="p-3">Level</th>
+                            <th class="p-3">Score</th>
+                            <th class="p-3">Common Mistakes Log</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherTableBody">
+                        <tr>
+                            <td colspan="6" class="p-6 text-center text-gray-400">Loading student logs...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bubbly-card bg-white p-6 border-4 border-gray-200 space-y-3">
+            <h4 class="font-bold text-base font-fun text-picnicDark"><i class="fa-solid fa-circle-info text-picnicBlue mr-1"></i> How to Connect Google Sheets Backend</h4>
+            <p class="text-xs text-gray-600 leading-relaxed">
+                To receive student submissions and performance data automatically into a Google Sheet:
+            </p>
+            <ol class="list-decimal list-inside text-xs text-gray-600 space-y-1">
+                <li>Create a Google Sheet with columns: <code class="bg-gray-100 px-1.5 py-0.5 rounded border">Timestamp, StudentName, Class, Score, Level, CommonMistakes</code>.</li>
+                <li>Go to <b>Extensions > Apps Script</b>, paste the script below, and deploy it as a <b>Web App</b> (execute as 'Me', access as 'Anyone').</li>
+                <li>Paste your deployed Web App URL into the <code class="bg-gray-100 px-1.5 py-0.5 rounded border">GOOGLE_APPS_SCRIPT_URL</code> constant at the top of this file.</li>
+            </ol>
+            <div class="bg-picnicDark text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto">
+                <pre>function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([data.Timestamp, data.StudentName, data.Class, data.Score, data.Level, data.CommonMistakes]);
+  return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
+}
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var rows = sheet.getDataRange().getValues();
+  var headers = rows.shift();
+  var result = rows.map(r => ({Timestamp:r[0], StudentName:r[1], Class:r[2], Score:r[3], Level:r[4], CommonMistakes:r[5]}));
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}</pre>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4 text-xs text-gray-500 font-inter border-t border-gray-200 mt-8">
+        Singapore MOE Primary 1 Mathematics • Teacher Dashboard Portal
+    </footer>
+
+    <script>
+        window.onload = function() {
+            loadTeacherDashboardData();
+        };
+
+        function loadTeacherDashboardData() {
+            const tbody = document.getElementById('teacherTableBody');
+            tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading logs...</td></tr>`;
+
+            let localLogs = [];
+            try {
+                localLogs = JSON.parse(localStorage.getItem('picnic_math_teacher_logs') || '[]');
+            } catch(e) {}
+
+            if (GOOGLE_APPS_SCRIPT_URL === "PASTE_YOUR_WEB_APP_URL_HERE") {
+                renderTeacherTable(localLogs);
+                return;
+            }
+
+            fetch(GOOGLE_APPS_SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const combined = [...data, ...localLogs];
+                    renderTeacherTable(combined);
+                })
+                .catch(err => {
+                    renderTeacherTable(localLogs);
+                });
+        }
+
+        function renderTeacherTable(logs) {
+            const tbody = document.getElementById('teacherTableBody');
+            const totalSubsEl = document.getElementById('teacherTotalSubs');
+            const avgScoreEl = document.getElementById('teacherAvgScore');
+
+            totalSubsEl.textContent = logs.length;
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-inter">No student submissions recorded yet. Have students play the practice game and submit their scores!</td></tr>`;
+                avgScoreEl.textContent = "0 pts";
+                return;
+            }
+
+            let totalScoreSum = 0;
+            let rowsHtml = '';
+
+            logs.forEach(row => {
+                totalScoreSum += Number(row.Score || 0);
+                let mistakesBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">None</span>`;
+                if (row.CommonMistakes && row.CommonMistakes !== "None (Perfect)") {
+                    mistakesBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold" title="${row.CommonMistakes}">Review Mistakes</span>`;
+                }
+
+                rowsHtml += `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="p-3 text-xs text-gray-500">${row.Timestamp || '-'}</td>
+                        <td class="p-3 font-bold text-picnicDark">${row.StudentName || '-'}</td>
+                        <td class="p-3 text-gray-700 font-semibold">${row.Class || '-'}</td>
+                        <td class="p-3"><span class="bg-picnicBlue/15 text-picnicBlue px-2 py-0.5 rounded-md text-xs font-bold uppercase">${row.Level || 'easy'}</span></td>
+                        <td class="p-3 font-bold text-picnicRed">${row.Score || 0} pts</td>
+                        <td class="p-3">${mistakesBadge}</td>
+                    </tr>
+                `;
+            });
+
+            const avg = Math.round(totalScoreSum / logs.length);
+            avgScoreEl.textContent = avg + " pts";
+            tbody.innerHTML = rowsHtml;
+        }
+
+        function exportCSVReport() {
+            let localLogs = [];
+            try {
+                localLogs = JSON.parse(localStorage.getItem('picnic_math_teacher_logs') || '[]');
+            } catch(e) {}
+
+            if (localLogs.length === 0) {
+                alert("No local submission data available to export.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Timestamp,StudentName,Class,Score,Level,CommonMistakes\n";
+            localLogs.forEach(row => {
+                csvContent += `"${row.Timestamp}","${row.StudentName}","${row.Class}","${row.Score}","${row.Level}","${row.CommonMistakes.replace(/"/g, '""')}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "picnic_party_math_report.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
